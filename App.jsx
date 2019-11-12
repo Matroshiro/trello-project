@@ -57,7 +57,7 @@ class App extends React.Component {
         return (
             <div>
                 <h1 className="text-center p-4 main-title">My homemade trello</h1>
-                <div className="card-deck container-fluid row">
+                <div className="card-deck container-fluid row margin-left">
                     {this.state.dataLists.map((list, index) => {
                         const cards = this.state.dataCards
                             .filter(card => card.idList == list.id);

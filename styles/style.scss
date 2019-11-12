@@ -5,15 +5,18 @@ h1 {
 }
 
 body {
-    background-color: $tertiary_color;
+    background-image: url("https://upload.wikimedia.org/wikipedia/commons/c/c7/A_View_of_Chongqing_Central_Business_District.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .task-title {
-    color: $primary_color;
     font-size: 20px;
     background-color: $primary_color;
     color: $secondary_color;
     font-weight: bold;
+    padding: 0;
+    border-radius: 0.3rem;
 }
 
 .main-title {
@@ -25,10 +28,13 @@ body {
 
 .list-content {
     flex: 0 0 27rem;
-    display: flex;
     flex-direction: column;
     background-color: #e2e4e6;
     max-height: calc(100vh - 11.8rem);
     border-radius: 0.3rem;
     margin-right: 1rem;
+}
+
+.margin-left {
+    margin-left: 10px;
 }
