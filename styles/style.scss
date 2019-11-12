@@ -3,3 +3,32 @@
 h1 {
     color: $primary_color;
 }
+
+body {
+    background-color: $tertiary_color;
+}
+
+.task-title {
+    color: $primary_color;
+    font-size: 20px;
+    background-color: $primary_color;
+    color: $secondary_color;
+    font-weight: bold;
+}
+
+.main-title {
+    background-color: $primary_color;
+    color: $secondary_color;
+    margin-bottom: 40px;
+    font-weight: bold;
+}
+
+.list-content {
+    flex: 0 0 27rem;
+    display: flex;
+    flex-direction: column;
+    background-color: #e2e4e6;
+    max-height: calc(100vh - 11.8rem);
+    border-radius: 0.3rem;
+    margin-right: 1rem;
+}
