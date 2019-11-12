@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Matroshiro/trello-project#readme",
   "dependencies": {
+    "bootstrap": "^4.3.1",
     "react": "^16.11.0",
     "react-dom": "^16.11.0"
   },
@@ -29,8 +30,12 @@
     "babel-loader": "^8.0.6",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
+    "css-loader": "^3.2.0",
+    "node-sass": "^4.13.0",
     "open-browser-webpack-plugin": "0.0.5",
     "path": "^0.12.7",
+    "sass-loader": "^8.0.0",
+    "style-loader": "^1.0.0",
     "webpack": "^4.41.2"
   }
 }
