@@ -2,7 +2,6 @@ import React from 'react';
 import "../styles/style.scss";
 import firebase from "../firebase/index";
 
-
 class Tasks extends React.Component {
 
     constructor() {
@@ -66,7 +65,7 @@ class Tasks extends React.Component {
         })
     }
 
-    _saveList(e) {
+    _saveList  = (e) => {
         console.log("passed")
         if (this.state.listName === '') {
             alert("this can not be empty")
@@ -86,6 +85,17 @@ class Tasks extends React.Component {
         }
     }
 
+    _handleDeleteList = (key) => {
+        firebase
+        .database()
+        .ref(`lists/${key}`)
+        .remove()
+        const listlenght = this.state.dataLists.length
+        if (listlenght === 1) {
+            this.setState({dataLists: []})
+        }
+    }
+
     render() {
         return (
             <div>
@@ -96,11 +106,14 @@ class Tasks extends React.Component {
                             .filter(card => card.idList == list.id);
                         return (
                             <div className="col-lg-2 list-content" key={index}>
-                                <div className="card-title task-title text-center p-3">{list.listName}</div>
+                                <div className="card-title task-title text-center p-3">
+                                    {list.listName}
+                                    <i className="fa fa-window-close" onClick={() => {this._handleDeleteList(list.key)
+                                    }} style={{float: "right"}}></i>
+                                </div>
                                 <div className="card">
                                     {
                                         cards.map((card, index) => {
-                                            console.log("card = " + JSON.stringify(card));
                                             return (
                                                 <div className="card-body" key={index}>
                                                     <div className="card-title">{card.cardTitle}</div>
