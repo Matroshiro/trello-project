@@ -148,6 +148,29 @@ class Tasks extends React.Component {
         }
     }
 
+    _handleMoveCard = (cardKey, moveByIndex) => {
+        const { dataLists, dataCards} = this.state;
+        const moveToAnotherList = dataLists[moveByIndex].key
+        let newKeyOfCard;
+        for (let i = 0; i < dataCards.length; i++) {
+            if (cardKey === dataCards[i].key) {
+                newKeyOfCard = i;
+            }
+        }
+
+        const newCard = dataCards[newKeyOfCard]
+
+        firebase
+        .database()
+        .ref("cards/")
+        .update({
+            [newCard.key] : {
+                listKey : moveToAnotherList,
+                cardName : newCard.cardName
+            }
+        });
+    }
+
     render() {
         return (
             <div>
@@ -167,20 +190,24 @@ class Tasks extends React.Component {
                                 </div>
                                 <div className="card">
                                     {
-                                        cards.map((card, index) => {
+                                        cards.map((card, indexTask) => {
                                             return (
-                                                <div className="card-body" key={index}>
+                                                <div className="card-body" key={indexTask}>
                                                     <div className="card-title">{card.cardName}<i className="fa fa-window-close" style={{ float: "right" }}></i></div>
                                                     <div className="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</div>
                                                 {
                                                     index >= 1 ? (
-                                                        <button>Left</button>
-                                                    ) : (<button disabled>Left</button>)
+                                                        <button className="bg-custom-primary" onClick={() => {
+                                                            this._handleMoveCard(card.key, index - 1)
+                                                        }}><i className="fa fa-arrow-circle-left secondary-color"></i></button>
+                                                    ) : (<button className="bg-custom-primary" disabled><i className="fa fa-arrow-circle-left"></i></button>)
                                                 }
                                                 {
                                                     index < this.state.dataLists.length - 1 ? (
-                                                        <button>Right</button>
-                                                    ) : (<button disabled>Right</button>)
+                                                        <button className="bg-custom-primary" onClick={() => {
+                                                            this._handleMoveCard(card.key, index + 1)
+                                                        }}><i className="fa fa-arrow-circle-right secondary-color"></i></button>
+                                                    ) : (<button className="bg-custom-primary" disabled><i className="fa fa-arrow-circle-right"></i></button>)
                                                 }
                                                 
                                                 </div>

@@ -10,6 +10,30 @@ body {
     background-size: cover;
 }
 
+.bg-custom-primary {
+    background-color: $primary_color;    
+}
+
+.bg-custom-secondary {
+    background-color: $secondary_color;    
+}
+
+.bg-custom-terttiary {
+    background-color: $tertiary_color;    
+}
+
+.primary-color {
+    color: $primary_color;
+}
+
+.secondary-color {
+    color: $secondary_color;
+}
+
+.tertiary-color {
+    color: $tertiary_color;
+}
+
 .task-title {
     font-size: 20px;
     background-color: $primary_color;
