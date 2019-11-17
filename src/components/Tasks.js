@@ -10,7 +10,7 @@ class Tasks extends React.Component {
             dataLists: [],
             dataCards: [],
             listName: "",
-            cardName: ""
+            cardName: "",
         }
     }
 
@@ -60,6 +60,7 @@ class Tasks extends React.Component {
     }
 
     _handleChange = (e) => {
+        console.log("e.target.key = " + e.target.key)
         this.setState({
             [e.target.name]: e.target.value
         })
@@ -86,6 +87,7 @@ class Tasks extends React.Component {
     }
 
     _saveCard = (key, title, index, e) => {
+
         if (this.state.cardName === '') {
             alert("this can not be empty")
         } else {
@@ -100,7 +102,7 @@ class Tasks extends React.Component {
                     }
                 })
             this.setState({
-                cardName: ''
+                cardName: ""
             })
         }
     }
@@ -143,13 +145,13 @@ class Tasks extends React.Component {
             .ref(`cards/${key}`)
             .remove()
         const cardsLenght = this.state.dataCards.length
-        if (cardsLenght === 1 || cardsLenght) {
+        if (cardsLenght === 1) {
             this.setState({ dataCards: [] })
         }
     }
 
     _handleMoveCard = (cardKey, moveByIndex) => {
-        const { dataLists, dataCards} = this.state;
+        const { dataLists, dataCards } = this.state;
         const moveToAnotherList = dataLists[moveByIndex].key
         let newKeyOfCard;
         for (let i = 0; i < dataCards.length; i++) {
@@ -161,14 +163,14 @@ class Tasks extends React.Component {
         const newCard = dataCards[newKeyOfCard]
 
         firebase
-        .database()
-        .ref("cards/")
-        .update({
-            [newCard.key] : {
-                listKey : moveToAnotherList,
-                cardName : newCard.cardName
-            }
-        });
+            .database()
+            .ref("cards/")
+            .update({
+                [newCard.key]: {
+                    listKey: moveToAnotherList,
+                    cardName: newCard.cardName
+                }
+            });
     }
 
     render() {
@@ -177,12 +179,12 @@ class Tasks extends React.Component {
                 <h1 className="text-center p-4 main-title">My homemade trello</h1>
                 <div className="card-deck container-fluid row margin-left">
                     {this.state.dataLists.map((list, index) => {
-                        
+
                         const cards = this.state.dataCards
                             .filter(card => card.listKey == list.key);
                         return (
                             <div className="col-lg-2 list-content" key={index}>
-                                <div className="card-title task-title text-center p-3">
+                                <div className="card-title list-title text-center p-3">
                                     {list.listName}
                                     <i className="fa fa-window-close" onClick={() => {
                                         this._handleDeleteList(list.key)
@@ -192,38 +194,57 @@ class Tasks extends React.Component {
                                     {
                                         cards.map((card, indexTask) => {
                                             return (
-                                                <div className="card-body" key={indexTask}>
-                                                    <div className="card-title">{card.cardName}<i className="fa fa-window-close" style={{ float: "right" }}></i></div>
-                                                    <div className="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</div>
-                                                {
-                                                    index >= 1 ? (
-                                                        <button className="bg-custom-primary" onClick={() => {
-                                                            this._handleMoveCard(card.key, index - 1)
-                                                        }}><i className="fa fa-arrow-circle-left secondary-color"></i></button>
-                                                    ) : (<button className="bg-custom-primary" disabled><i className="fa fa-arrow-circle-left"></i></button>)
-                                                }
-                                                {
-                                                    index < this.state.dataLists.length - 1 ? (
-                                                        <button className="bg-custom-primary" onClick={() => {
-                                                            this._handleMoveCard(card.key, index + 1)
-                                                        }}><i className="fa fa-arrow-circle-right secondary-color"></i></button>
-                                                    ) : (<button className="bg-custom-primary" disabled><i className="fa fa-arrow-circle-right"></i></button>)
-                                                }
-                                                
+                                                <div className="card-body primary-shadow card-content" key={indexTask}>
+                                                    <i onClick={() => {
+                                                        this._handleDeleteCard(card.key)
+                                                    }} className="fa fa-window-close" style={{ float: "right" }}></i>
+                                                    <div className="card-title task-text">{card.cardName}</div>
+                                                    {/*<div className="card-text"></div>*/}
+                                                    <div className="row" style={{display : "block"}}>
+                                                        {
+                                                            index >= 1 ? (
+                                                                <button className="bg-custom-primary" onClick={() => {
+                                                                    this._handleMoveCard(card.key, index - 1)
+                                                                }}><i className="fa fa-arrow-circle-left secondary-color"></i></button>
+                                                            ) : (<button className="bg-custom-primary" disabled><i className="fa fa-arrow-circle-left"></i></button>)
+                                                        }
+                                                        {
+                                                            index < this.state.dataLists.length - 1 ? (
+                                                                <button className="bg-custom-primary pull-right" onClick={() => {
+                                                                    this._handleMoveCard(card.key, index + 1)
+                                                                }}><i className="fa fa-arrow-circle-right secondary-color"></i></button>
+                                                            ) : (<button className="bg-custom-primary pull-right" disabled><i className="fa fa-arrow-circle-right"></i></button>)
+                                                        }
+
+
+                                                    </div>
+
                                                 </div>
                                             )
                                         })
                                     }
-                                    <div className="card-footer">
+                                    <div className="card-footer custom-footer">
                                         <div className="row">
-                                            <input
+                                            <textarea
+                                                className="add-task"
+                                                key={index}
                                                 placeholder="Add a task"
                                                 type="text"
                                                 name="cardName"
                                                 value={this.state.cardName}
                                                 onChange={this._handleChange}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        this._saveCard(
+                                                            { key: list.key },
+                                                            { title: this.state.cardName },
+                                                            { index: list.index },
+                                                            { e }
+                                                        )
+                                                    }
+                                                }}
                                             />
-                                            <button onClick={(key, title, index, e) =>
+                                            {/*<button onClick={(key, title, index, e) =>
 
                                                 this._saveCard(
                                                     { key: list.key },
@@ -232,10 +253,10 @@ class Tasks extends React.Component {
                                                     { e }
                                                 )
 
-                                            }>Save</button>
+                                            }>Save</button>*/}
                                         </div>
 
-                                        <small className="text-muted">Last updated 3 mins ago</small>
+                                        <small className="text-muted">zapptax technical test</small>
                                     </div>
                                 </div>
                             </div>
@@ -243,18 +264,25 @@ class Tasks extends React.Component {
                     }
                     )}
                     <div>
-                        <div className="card">
-                            <div className="card-header">
+                        <div className="card border-custom">
+                            <div className="card-header add-list">
                                 <div className="row">
                                     <input
+                                        className="bg-custom-primary add-list-input "
                                         placeholder="Add a List"
                                         type="text"
                                         name="listName"
                                         value={this.state.listName}
-                                        onChange={this._handleChange} />
-                                    <button
+                                        onChange={this._handleChange}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                this._saveList()
+                                            }
+                                        }}
+                                         />
+                                    {/*<button
                                         onClick={() => this._saveList()}
-                                    >Save</button>
+                                    >Save</button>*/}
                                 </div>
                             </div>
                         </div>

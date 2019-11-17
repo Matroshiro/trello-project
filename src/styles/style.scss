@@ -22,6 +22,43 @@ body {
     background-color: $tertiary_color;    
 }
 
+.card-content {
+    min-height: 150px;
+}
+
+input {
+    border: none;
+}
+
+.primary-shadow {
+    box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.2), 0 3px 4px 0 rgba(0, 0, 0, 0.14), 0 1px 8px 0 rgba(0, 0, 0, 0.12);
+}
+
+.custom-footer {
+    font-size: large;
+}
+
+.task-text {
+    font-size: 20px;
+    color: $primary_color;
+    font-weight: bold;
+    
+}
+
+.add-task {
+    width: 100%;
+    min-height: 100px;
+}
+
+.add-list {
+    background-color: $primary_color;
+}
+
+button {
+    border: none;
+    margin: 10px;
+}
+
 .primary-color {
     color: $primary_color;
 }
@@ -34,13 +71,20 @@ body {
     color: $tertiary_color;
 }
 
-.task-title {
+.list-title {
     font-size: 20px;
     background-color: $primary_color;
     color: $secondary_color;
     font-weight: bold;
     padding: 0;
     border-radius: 0.3rem;
+}
+
+.add-list-input {
+    color: $secondary_color;
+    font-size: 20px;
+    font-weight: bold;
+    min-height: 30px;
 }
 
 .main-title {
@@ -58,6 +102,11 @@ body {
     border-radius: 0.3rem;
     margin-right: 1rem;
     padding: 0;
+    box-shadow: 0 3px 3px -2px rgba(0,0,0,.2), 0 3px 4px 0 rgba(0,0,0,.14), 0 1px 8px 0 rgba(0,0,0,.12);
+}
+
+.border-custom {
+    border: none;
     box-shadow: 0 3px 3px -2px rgba(0,0,0,.2), 0 3px 4px 0 rgba(0,0,0,.14), 0 1px 8px 0 rgba(0,0,0,.12);
 }
 
