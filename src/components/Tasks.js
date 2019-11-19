@@ -219,15 +219,17 @@ class Tasks extends React.Component {
                                                             index >= 1 ? (
                                                                 <button className="bg-custom-primary" onClick={() => {
                                                                     this._handleMoveCard(card.key, index - 1)
-                                                                }}><i className="fa fa-arrow-circle-left secondary-color"></i></button>
-                                                            ) : (<button className="bg-custom-primary" disabled><i className="fa fa-arrow-circle-left"></i></button>)
+                                                                }}><i className="fa fa-arrow-left secondary-color"></i></button>
+                                                            ) : (<button className="" disabled>
+                                                                <i className="grey fa fa-arrow-left"></i></button>)
                                                         }
                                                         {
                                                             index < this.state.dataLists.length - 1 ? (
                                                                 <button className="bg-custom-primary pull-right" onClick={() => {
                                                                     this._handleMoveCard(card.key, index + 1)
-                                                                }}><i className="fa fa-arrow-circle-right secondary-color"></i></button>
-                                                            ) : (<button className="bg-custom-primary pull-right" disabled><i className="fa fa-arrow-circle-right"></i></button>)
+                                                                }}><i className="fa fa-arrow-right secondary-color"></i></button>
+                                                            ) : (<button className="pull-right" disabled>
+                                                                <i className="grey fa fa-arrow-right"></i></button>)
                                                         }
 
 

@@ -8,10 +8,19 @@ body {
     background-image: url("https://upload.wikimedia.org/wikipedia/commons/c/c7/A_View_of_Chongqing_Central_Business_District.jpg");
     background-repeat: no-repeat;
     background-size: cover;
+    color: #172b4d;
+//    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Droid Sans,Helvetica Neue,sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
 }
 
 .bg-custom-primary {
     background-color: $primary_color;    
+}
+
+.grey {
+    color: rgb(151, 151, 151);
 }
 
 .bg-custom-secondary {
@@ -23,7 +32,6 @@ body {
 }
 
 .card-content {
-    min-height: 150px;
     margin: 10px;
     border-radius: 3px;
 }
@@ -42,10 +50,14 @@ input {
     max-height: 38px;
     display: flex;
     justify-content: space-between;
-//    background-color: #888888;
-//    background-color: #e2e4e6;
+    color: #5e6c84;
     margin: 10px;
-    border-radius: 3px;;
+    border-radius: 3px;
+    text-align: center;
+    font-style: italic;
+    font-size: large;
+    display: block;
+    padding-top: 0.3em;
 }
 
 .add-task-toggle-off:hover {
@@ -82,8 +94,22 @@ input {
 }
 
 .add-task {
+    background: none;
+    border: none;
+    box-shadow: none;
+    height: auto;
+    margin-bottom: 4px;
+    max-height: 162px;
+    min-height: 54px;
+    overflow-y: auto;
+    padding: 0;
     width: 100%;
-    min-height: 100px;
+    overflow: hidden;
+    overflow-wrap: break-word;
+    resize: none;
+    height: 54px;
+    background-color: white;
+    padding: 10px;
 }
 
 .save-button {
