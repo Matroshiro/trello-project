@@ -11,7 +11,9 @@ class Tasks extends React.Component {
             dataCards: [],
             listName: "",
             cardName: "",
+            adding: -1
         }
+        this.handleClick = this._handleClick.bind(this);
     }
 
     componentDidMount() {
@@ -59,6 +61,10 @@ class Tasks extends React.Component {
             })
     }
 
+    componentDidUpdate() {
+
+    }
+
     _handleChange = (e) => {
         console.log("e.target.key = " + e.target.key)
         this.setState({
@@ -102,10 +108,18 @@ class Tasks extends React.Component {
                     }
                 })
             this.setState({
-                cardName: ""
+                cardName: "",
+                adding: -1
             })
         }
     }
+
+    _handleClick(index, e) {
+        console.log(this.state.index);
+        this.setState({
+          adding: index
+        });
+      }
 
     _handleDeleteList = (key) => {
 
@@ -190,17 +204,17 @@ class Tasks extends React.Component {
                                         this._handleDeleteList(list.key)
                                     }} style={{ float: "right" }}></i>
                                 </div>
-                                <div className="card">
+                                <div className="my-custom-card">
                                     {
                                         cards.map((card, indexTask) => {
                                             return (
-                                                <div className="card-body primary-shadow card-content" key={indexTask}>
+                                                <div className="card-body primary-shadow card-content bg-white" key={indexTask}>
                                                     <i onClick={() => {
                                                         this._handleDeleteCard(card.key)
                                                     }} className="fa fa-window-close" style={{ float: "right" }}></i>
                                                     <div className="card-title task-text">{card.cardName}</div>
                                                     {/*<div className="card-text"></div>*/}
-                                                    <div className="row" style={{display : "block"}}>
+                                                    <div className="row" style={{ display: "block" }}>
                                                         {
                                                             index >= 1 ? (
                                                                 <button className="bg-custom-primary" onClick={() => {
@@ -223,41 +237,49 @@ class Tasks extends React.Component {
                                             )
                                         })
                                     }
-                                    <div className="card-footer custom-footer">
-                                        <div className="row">
-                                            <textarea
-                                                className="add-task"
-                                                key={index}
-                                                placeholder="Add a task"
-                                                type="text"
-                                                name="cardName"
-                                                value={this.state.cardName}
-                                                onChange={this._handleChange}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        this._saveCard(
-                                                            { key: list.key },
-                                                            { title: this.state.cardName },
-                                                            { index: list.index },
-                                                            { e }
-                                                        )
-                                                    }
-                                                }}
-                                            />
-                                            {/*<button onClick={(key, title, index, e) =>
+                                    {
+                                        console.log(JSON.stringify(this.state.adding) + " && " + index)
+                                    }
+                                    {
+                                        this.state.adding == index ?
+                                            <div className="card-footer custom-footer">
+                                                <div className="row">
+                                                    <textarea
+                                                        className="add-task"
+                                                        key={index}
+                                                        placeholder="Add a task"
+                                                        type="text"
+                                                        name="cardName"
+                                                        value={this.state.cardName}
+                                                        onChange={this._handleChange}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                this._saveCard(
+                                                                    { key: list.key },
+                                                                    { title: this.state.cardName },
+                                                                    { index: list.index },
+                                                                    { e }
+                                                                )
+                                                            }
+                                                        }}
+                                                    />
+                                                    <div className="new-task-footer">
+                                                        <button className="save-button" onClick={(e) =>{this._saveCard(
+                                                                    { key: list.key },
+                                                                    { title: this.state.cardName },
+                                                                    { index: list.index },
+                                                                    { e }
+                                                                )}}>Save</button>
+                                                        <i onClick={this._handleClick.bind(this, -1)} className="fa fa-2x fa-times" style={{ float: "right" }}></i>                                                    </div>
+                                                </div>
+                                                <small className="text-muted">zapptax technical test</small>
+                                            </div>
+                                            :
+                                            <div className="add-task-toggle-off" onClick={this._handleClick.bind(this, index)}>
+                                                Add a task
+                                            </div>
+                                    }
 
-                                                this._saveCard(
-                                                    { key: list.key },
-                                                    { title: this.state.cardName },
-                                                    { index: list.index },
-                                                    { e }
-                                                )
-
-                                            }>Save</button>*/}
-                                        </div>
-
-                                        <small className="text-muted">zapptax technical test</small>
-                                    </div>
                                 </div>
                             </div>
                         )
@@ -279,7 +301,7 @@ class Tasks extends React.Component {
                                                 this._saveList()
                                             }
                                         }}
-                                         />
+                                    />
                                     {/*<button
                                         onClick={() => this._saveList()}
                                     >Save</button>*/}

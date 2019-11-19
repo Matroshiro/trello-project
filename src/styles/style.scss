@@ -24,10 +24,45 @@ body {
 
 .card-content {
     min-height: 150px;
+    margin: 10px;
+    border-radius: 3px;
+}
+
+.new-task-footer {
+    display: block;
+
 }
 
 input {
     border: none;
+}
+
+.add-task-toggle-off {
+    min-height: 38px;
+    max-height: 38px;
+    display: flex;
+    justify-content: space-between;
+//    background-color: #888888;
+//    background-color: #e2e4e6;
+    margin: 10px;
+    border-radius: 3px;;
+}
+
+.add-task-toggle-off:hover {
+    background-color: rgba(9,30,66,.08);
+    cursor: pointer;
+}
+
+.my-custom-card {
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-clip: border-box;
+    border-radius: .25rem;
 }
 
 .primary-shadow {
@@ -36,6 +71,7 @@ input {
 
 .custom-footer {
     font-size: large;
+    background-color: #e2e4e6;
 }
 
 .task-text {
@@ -48,6 +84,10 @@ input {
 .add-task {
     width: 100%;
     min-height: 100px;
+}
+
+.save-button {
+    cursor: pointer;
 }
 
 .add-list {
