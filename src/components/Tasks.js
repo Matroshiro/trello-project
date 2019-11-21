@@ -11,9 +11,12 @@ class Tasks extends React.Component {
             dataCards: [],
             listName: "",
             cardName: "",
-            adding: -1
+            adding: -1,
+            editingCard: -1,
+            editingList: -1,
+            textEdited: ""
         }
-        this.handleClick = this._handleClick.bind(this);
+        this._handleClick = this._handleClick.bind(this);
     }
 
     componentDidMount() {
@@ -117,9 +120,36 @@ class Tasks extends React.Component {
     _handleClick(index, e) {
         console.log(this.state.index);
         this.setState({
-          adding: index
+            adding: index
         });
-      }
+    }
+
+    _handleEditList(index) {
+        console.log("_handkeEditList && index = " + index)
+        this.setState({
+            editingList: index,
+            textEdited: this.state.dataLists[index].listName
+        });
+    }
+
+    _editListName(e, index) {
+        console.log("saving new listName && index = " + index)
+        console.log(JSON.stringify(this.state.dataLists[index]))
+        if (this.state.text === '') {
+            alert("this can not be empty")
+        } else {
+            firebase
+                .database()
+                .ref('lists/' + this.state.dataLists[index].key)
+                .set({
+                    listName: this.state.textEdited
+                })
+            this.setState({
+                editingList: -1,
+                textEdited: ""
+            })
+        }
+    }
 
     _handleDeleteList = (key) => {
 
@@ -198,12 +228,43 @@ class Tasks extends React.Component {
                             .filter(card => card.listKey == list.key);
                         return (
                             <div className="col-lg-2 list-content" key={index}>
-                                <div className="card-title list-title text-center p-3">
-                                    {list.listName}
-                                    <i className="fa fa-window-close" onClick={() => {
-                                        this._handleDeleteList(list.key)
-                                    }} style={{ float: "right" }}></i>
-                                </div>
+
+                                {
+                                    this.state.editingList == index ?
+
+
+                                        <div className="card-title list-title text-center">
+                                            <div className="card-header add-list">
+                                                <i className="fa fa-edit" onClick={(e) => {
+                                                    this._editListName(e, index)
+                                                }} style={{ position: "fixed" }}></i>
+                                                <input
+                                                    className="bg-custom-primary add-list-input "
+                                                    placeholder="Add a List"
+                                                    type="text"
+                                                    name="textEdited"
+                                                    value={this.state.textEdited}
+                                                    onChange={this._handleChange}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            console.log("index inline = " + index)
+                                                            this._editListName(e, index)
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+
+
+                                        :
+                                        <div className="card-title list-title text-center p-3" onClick={this._handleEditList.bind(this, index)}>
+                                            {list.listName}
+                                            <i className="fa fa-window-close" onClick={() => {
+                                                this._handleDeleteList(list.key)
+                                            }} style={{ float: "right" }}></i>
+                                        </div>
+                                }
+
                                 <div className="my-custom-card">
                                     {
                                         cards.map((card, indexTask) => {
@@ -266,12 +327,14 @@ class Tasks extends React.Component {
                                                         }}
                                                     />
                                                     <div className="new-task-footer">
-                                                        <button className="save-button" onClick={(e) =>{this._saveCard(
-                                                                    { key: list.key },
-                                                                    { title: this.state.cardName },
-                                                                    { index: list.index },
-                                                                    { e }
-                                                                )}}>Save</button>
+                                                        <button type="button" className="save-button" onClick={(e) => {
+                                                            this._saveCard(
+                                                                { key: list.key },
+                                                                { title: this.state.cardName },
+                                                                { index: list.index },
+                                                                { e }
+                                                            )
+                                                        }}>Save</button>
                                                         <i onClick={this._handleClick.bind(this, -1)} className="fa fa-2x fa-times" style={{ float: "right" }}></i>                                                    </div>
                                                 </div>
                                                 <small className="text-muted">zapptax technical test</small>
