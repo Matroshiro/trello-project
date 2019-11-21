@@ -17,10 +17,13 @@ class Tasks extends React.Component {
             textEdited: ""
         }
         this._handleClick = this._handleClick.bind(this);
+        this.setWrapperRef = this.setWrapperRef.bind(this);
+        this._handleClickOutside = this._handleClickOutside.bind(this);
     }
 
     componentDidMount() {
         const myList = firebase.database().ref('lists/');
+        document.addEventListener('mousedown', this._handleClickOutside);
 
         myList
             .on('value', (snapshot) => {
@@ -62,6 +65,10 @@ class Tasks extends React.Component {
                     })
                 }
             })
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('mousedown', this._handleClickOutside);
     }
 
     componentDidUpdate() {
@@ -117,10 +124,29 @@ class Tasks extends React.Component {
         }
     }
 
+    setWrapperRef(node) {
+        this.wrapperRef = node;
+    }
+
+    _handleClickOutside(event) {
+        if (this.wrapperRef && !this.wrapperRef.contains(event.target)) {
+          this.setState({
+            listName: "",
+            cardName: "",
+            adding: -1,
+            editingCard: -1,
+            editingList: -1,
+            textEdited: ""
+          })
+        }
+      }
+
     _handleClick(index, e) {
         console.log(this.state.index);
         this.setState({
-            adding: index
+            adding: index,
+            editingList: -1,
+            textEdited: ""
         });
     }
 
@@ -135,7 +161,7 @@ class Tasks extends React.Component {
     _editListName(e, index) {
         console.log("saving new listName && index = " + index)
         console.log(JSON.stringify(this.state.dataLists[index]))
-        if (this.state.text === '') {
+        if (this.state.textEdited === '') {
             alert("this can not be empty")
         } else {
             firebase
@@ -221,7 +247,7 @@ class Tasks extends React.Component {
         return (
             <div>
                 <h1 className="text-center p-4 main-title">My homemade trello</h1>
-                <div className="card-deck container-fluid row margin-left">
+                <div ref={this.setWrapperRef} className="card-deck container-fluid row margin-left">
                     {this.state.dataLists.map((list, index) => {
 
                         const cards = this.state.dataCards
@@ -299,9 +325,6 @@ class Tasks extends React.Component {
                                                 </div>
                                             )
                                         })
-                                    }
-                                    {
-                                        console.log(JSON.stringify(this.state.adding) + " && " + index)
                                     }
                                     {
                                         this.state.adding == index ?
