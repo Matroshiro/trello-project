@@ -13,7 +13,8 @@ class Tasks extends React.Component {
             cardName: "",
             adding: -1,
             editingCard: -1,
-            editingList: -1,
+            editingCardInList: -1,
+            editingList: -1,    
             textEdited: ""
         }
         this._handleClick = this._handleClick.bind(this);
@@ -177,6 +178,41 @@ class Tasks extends React.Component {
         }
     }
 
+    _handleEditTask(index, indexTask, key) {
+        console.log("key = " + key)
+       console.log("this.state.dataCards = " + JSON.stringify(this.state.dataCards))
+        const posTask = this.state.dataCards.findIndex(element => element.key == key);
+        console.log("indexTask = " + indexTask)
+        console.log("this.state.dataCards[posTask].cardName = " + this.state.dataCards[posTask].cardName)
+        console.log("index = " + index)
+   //     console.log("posTask = " + posTask)
+        this.setState({
+            editingCard: indexTask,
+            textEdited: this.state.dataCards[posTask].cardName,
+            editingCardInList: index
+        });
+    }
+
+    _editTaskName(e, key, listKey) {
+        console.log("key = " + key + "  && listKey = " + listKey)
+        if (this.state.textEdited === '') {
+            alert("this can not be empty")
+        } else {
+            firebase
+                .database()
+                .ref('cards/' + key)
+                .set({
+                    cardName: this.state.textEdited,
+                    listKey: listKey
+                })
+            this.setState({
+                editingCard: -1,
+                textEdited: "",
+                editingCardInList: -1
+            })
+        }
+    }
+
     _handleDeleteList = (key) => {
 
         const { dataCards } = this.state;
@@ -299,7 +335,30 @@ class Tasks extends React.Component {
                                                     <i onClick={() => {
                                                         this._handleDeleteCard(card.key)
                                                     }} className="fa fa-window-close" style={{ float: "right" }}></i>
-                                                    <div className="card-title task-text">{card.cardName}</div>
+                                                    {console.log(this.state.editingCard + " " + indexTask + " && " + this.state.editingCardInList + " " + index)}
+                                                    {
+                                                        this.state.editingCard == indexTask && this.state.editingCardInList == index ?
+                                                        <textarea
+                                                            className="add-task task-text no-shadow"
+                                                            placeholder="Add a Task"
+                                                            type="text"
+                                                            name="textEdited"
+                                                            value={this.state.textEdited}
+                                                            onChange={this._handleChange}
+                                                            onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                console.log("index inline = " + index)
+                                                                this._editTaskName(e, card.key, card.listKey)
+                                                            }
+                                                            }} 
+                                                        >
+                                                        </textarea>
+                                                        :
+                                                        <div className="card-title task-text" onClick={this._handleEditTask.bind(this, index, indexTask, card.key)}>
+                                                            {card.cardName}
+                                                        </div>
+
+                                                    }
                                                     {/*<div className="card-text"></div>*/}
                                                     <div className="row" style={{ display: "block" }}>
                                                         {

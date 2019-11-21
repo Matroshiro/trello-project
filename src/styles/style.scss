@@ -168,6 +168,10 @@ button {
     font-weight: bold;
 }
 
+.no-shadow {
+    box-shadow: none;
+}
+
 .list-content {
     height: fit-content;
     flex: 0 0 27rem;
