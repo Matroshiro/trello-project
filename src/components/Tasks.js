@@ -1,6 +1,8 @@
 import React from 'react';
 import "../styles/style.scss";
 import firebase from "../firebase/index";
+import Board from "./Board";
+import Card from "./Card";
 
 class Tasks extends React.Component {
 
@@ -14,7 +16,7 @@ class Tasks extends React.Component {
             adding: -1,
             editingCard: -1,
             editingCardInList: -1,
-            editingList: -1,    
+            editingList: -1,
             textEdited: ""
         }
         this._handleClick = this._handleClick.bind(this);
@@ -104,7 +106,6 @@ class Tasks extends React.Component {
     }
 
     _saveCard = (key, title, index, e) => {
-
         if (this.state.cardName === '') {
             alert("this can not be empty")
         } else {
@@ -131,19 +132,18 @@ class Tasks extends React.Component {
 
     _handleClickOutside(event) {
         if (this.wrapperRef && !this.wrapperRef.contains(event.target)) {
-          this.setState({
-            listName: "",
-            cardName: "",
-            adding: -1,
-            editingCard: -1,
-            editingList: -1,
-            textEdited: ""
-          })
+            this.setState({
+                listName: "",
+                cardName: "",
+                adding: -1,
+                editingCard: -1,
+                editingList: -1,
+                textEdited: ""
+            })
         }
-      }
+    }
 
     _handleClick(index, e) {
-        console.log(this.state.index);
         this.setState({
             adding: index,
             editingList: -1,
@@ -152,7 +152,6 @@ class Tasks extends React.Component {
     }
 
     _handleEditList(index) {
-        console.log("_handkeEditList && index = " + index)
         this.setState({
             editingList: index,
             textEdited: this.state.dataLists[index].listName
@@ -160,8 +159,6 @@ class Tasks extends React.Component {
     }
 
     _editListName(e, index) {
-        console.log("saving new listName && index = " + index)
-        console.log(JSON.stringify(this.state.dataLists[index]))
         if (this.state.textEdited === '') {
             alert("this can not be empty")
         } else {
@@ -179,13 +176,7 @@ class Tasks extends React.Component {
     }
 
     _handleEditTask(index, indexTask, key) {
-        console.log("key = " + key)
-       console.log("this.state.dataCards = " + JSON.stringify(this.state.dataCards))
         const posTask = this.state.dataCards.findIndex(element => element.key == key);
-        console.log("indexTask = " + indexTask)
-        console.log("this.state.dataCards[posTask].cardName = " + this.state.dataCards[posTask].cardName)
-        console.log("index = " + index)
-   //     console.log("posTask = " + posTask)
         this.setState({
             editingCard: indexTask,
             textEdited: this.state.dataCards[posTask].cardName,
@@ -194,7 +185,6 @@ class Tasks extends React.Component {
     }
 
     _editTaskName(e, key, listKey) {
-        console.log("key = " + key + "  && listKey = " + listKey)
         if (this.state.textEdited === '') {
             alert("this can not be empty")
         } else {
@@ -216,7 +206,6 @@ class Tasks extends React.Component {
     _handleDeleteList = (key) => {
 
         const { dataCards } = this.state;
-        console.log(dataCards)
         let cardsNbr = 0;
 
         for (let i = 0; i < dataCards.length; i++) {
@@ -224,8 +213,6 @@ class Tasks extends React.Component {
                 cardsNbr++;
             }
         }
-
-        console.log("cardsNbr = " + cardsNbr)
         if (cardsNbr > 0) {
             for (let i = 0; i < dataCards.length; i++) {
                 if (key === dataCards[i].listKey) {
@@ -279,7 +266,13 @@ class Tasks extends React.Component {
             });
     }
 
+    testFunction = (key, title) => {
+        console.log("Passed in testFunction")
+    }
+
     render() {
+        const { translateX, translateY, isDragging } = this.state;
+
         return (
             <div>
                 <h1 className="text-center p-4 main-title">My homemade trello</h1>
@@ -289,145 +282,146 @@ class Tasks extends React.Component {
                         const cards = this.state.dataCards
                             .filter(card => card.listKey == list.key);
                         return (
-                            <div className="col-lg-2 list-content" key={index}>
+                            <div className="col-lg-2 list-content" id={list.key} key={index}>
+                                <Board id={list.key} key={index} _saveList={this._saveList} dataLists={this.state.dataLists}>
 
-                                {
-                                    this.state.editingList == index ?
-
-
-                                        <div className="card-title list-title text-center">
-                                            <div className="card-header add-list">
-                                                <i className="fa fa-edit" onClick={(e) => {
-                                                    this._editListName(e, index)
-                                                }} style={{ position: "fixed" }}></i>
-                                                <input
-                                                    className="bg-custom-primary add-list-input "
-                                                    placeholder="Add a List"
-                                                    type="text"
-                                                    name="textEdited"
-                                                    value={this.state.textEdited}
-                                                    onChange={this._handleChange}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') {
-                                                            console.log("index inline = " + index)
-                                                            this._editListName(e, index)
-                                                        }
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-
-
-                                        :
-                                        <div className="card-title list-title text-center p-3" onClick={this._handleEditList.bind(this, index)}>
-                                            {list.listName}
-                                            <i className="fa fa-window-close" onClick={() => {
-                                                this._handleDeleteList(list.key)
-                                            }} style={{ float: "right" }}></i>
-                                        </div>
-                                }
-
-                                <div className="my-custom-card">
                                     {
-                                        cards.map((card, indexTask) => {
-                                            return (
-                                                <div className="card-body primary-shadow card-content bg-white" key={indexTask}>
-                                                    <i onClick={() => {
-                                                        this._handleDeleteCard(card.key)
-                                                    }} className="fa fa-window-close" style={{ float: "right" }}></i>
-                                                    {console.log(this.state.editingCard + " " + indexTask + " && " + this.state.editingCardInList + " " + index)}
-                                                    {
-                                                        this.state.editingCard == indexTask && this.state.editingCardInList == index ?
-                                                        <textarea
-                                                            className="add-task task-text no-shadow"
-                                                            placeholder="Add a Task"
-                                                            type="text"
-                                                            name="textEdited"
-                                                            value={this.state.textEdited}
-                                                            onChange={this._handleChange}
-                                                            onKeyDown={(e) => {
-                                                            if (e.key === 'Enter') {
-                                                                console.log("index inline = " + index)
-                                                                this._editTaskName(e, card.key, card.listKey)
-                                                            }
-                                                            }} 
-                                                        >
-                                                        </textarea>
-                                                        :
-                                                        <div className="card-title task-text" onClick={this._handleEditTask.bind(this, index, indexTask, card.key)}>
-                                                            {card.cardName}
-                                                        </div>
-
-                                                    }
-                                                    {/*<div className="card-text"></div>*/}
-                                                    <div className="row" style={{ display: "block" }}>
-                                                        {
-                                                            index >= 1 ? (
-                                                                <button className="bg-custom-primary" onClick={() => {
-                                                                    this._handleMoveCard(card.key, index - 1)
-                                                                }}><i className="fa fa-arrow-left secondary-color"></i></button>
-                                                            ) : (<button className="" disabled>
-                                                                <i className="grey fa fa-arrow-left"></i></button>)
-                                                        }
-                                                        {
-                                                            index < this.state.dataLists.length - 1 ? (
-                                                                <button className="bg-custom-primary pull-right" onClick={() => {
-                                                                    this._handleMoveCard(card.key, index + 1)
-                                                                }}><i className="fa fa-arrow-right secondary-color"></i></button>
-                                                            ) : (<button className="pull-right" disabled>
-                                                                <i className="grey fa fa-arrow-right"></i></button>)
-                                                        }
+                                        this.state.editingList == index ?
 
 
-                                                    </div>
-
-                                                </div>
-                                            )
-                                        })
-                                    }
-                                    {
-                                        this.state.adding == index ?
-                                            <div className="card-footer custom-footer">
-                                                <div className="row">
-                                                    <textarea
-                                                        className="add-task"
-                                                        key={index}
-                                                        placeholder="Add a task"
+                                            <div className="card-title list-title text-center">
+                                                <div className="card-header add-list">
+                                                    <i className="fa fa-edit" onClick={(e) => {
+                                                        this._editListName(e, index)
+                                                    }} style={{ position: "fixed" }}></i>
+                                                    <input
+                                                        className="bg-custom-primary add-list-input "
+                                                        placeholder="Add a List"
                                                         type="text"
-                                                        name="cardName"
-                                                        value={this.state.cardName}
+                                                        name="textEdited"
+                                                        value={this.state.textEdited}
                                                         onChange={this._handleChange}
                                                         onKeyDown={(e) => {
                                                             if (e.key === 'Enter') {
-                                                                this._saveCard(
-                                                                    { key: list.key },
-                                                                    { title: this.state.cardName },
-                                                                    { index: list.index },
-                                                                    { e }
-                                                                )
+                                                                console.log("index inline = " + index)
+                                                                this._editListName(e, index)
                                                             }
                                                         }}
                                                     />
-                                                    <div className="new-task-footer">
-                                                        <button type="button" className="save-button" onClick={(e) => {
+                                                </div>
+                                            </div>
+
+
+                                            :
+                                            <div className="card-title list-title text-center p-3" onClick={this._handleEditList.bind(this, index)}>
+                                                {list.listName}
+                                                <i className="fa fa-window-close" onClick={() => {
+                                                    this._handleDeleteList(list.key)
+                                                }} style={{ float: "right" }}></i>
+                                            </div>
+                                    }
+                                        {
+                                            cards.map((card, indexTask) => {
+                                                return (
+                                                    <Card 
+                                                        id={card.key}
+                                                        className="card-body primary-shadow card-content bg-white"
+                                                        key={indexTask}
+                                                        draggable="true"
+                                                    >
+                                                        <i onClick={() => {
+                                                            this._handleDeleteCard(card.key)
+                                                        }} className="fa fa-window-close" style={{ float: "right" }}></i>
+                                                        {
+                                                            this.state.editingCard == indexTask && this.state.editingCardInList == index ?
+                                                                <textarea
+                                                                    className="add-task task-text no-shadow"
+                                                                    placeholder="Add a Task"
+                                                                    type="text"
+                                                                    name="textEdited"
+                                                                    value={this.state.textEdited}
+                                                                    onChange={this._handleChange}
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === 'Enter') {
+                                                                            this._editTaskName(e, card.key, card.listKey)
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                </textarea>
+                                                                :
+                                                                <div className="card-title task-text" onClick={this._handleEditTask.bind(this, index, indexTask, card.key)}>
+                                                                    {card.cardName}
+                                                                </div>
+
+                                                        }
+                                                        {/*<div className="card-text"></div>*/}
+                                                        <div className="row" style={{ display: "block" }}>
+                                                            {
+                                                                index >= 1 ? (
+                                                                    <button className="bg-custom-primary" onClick={() => {
+                                                                        this._handleMoveCard(card.key, index - 1)
+                                                                    }}><i className="fa fa-arrow-left secondary-color"></i></button>
+                                                                ) : (<button className="" disabled>
+                                                                    <i className="grey fa fa-arrow-left"></i></button>)
+                                                            }
+                                                            {
+                                                                index < this.state.dataLists.length - 1 ? (
+                                                                    <button className="bg-custom-primary pull-right" onClick={() => {
+                                                                        this._handleMoveCard(card.key, index + 1)
+                                                                    }}><i className="fa fa-arrow-right secondary-color"></i></button>
+                                                                ) : (<button className="pull-right" disabled>
+                                                                    <i className="grey fa fa-arrow-right"></i></button>)
+                                                            }
+
+
+                                                        </div>
+
+                                                    </Card>
+                                                )
+                                            })
+                                        }
+                                </Board>
+                                {
+                                    this.state.adding == index ?
+                                        <div className="card-footer custom-footer">
+                                            <div className="row">
+                                                <textarea
+                                                    className="add-task"
+                                                    key={index}
+                                                    placeholder="Add a task"
+                                                    type="text"
+                                                    name="cardName"
+                                                    value={this.state.cardName}
+                                                    onChange={this._handleChange}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
                                                             this._saveCard(
                                                                 { key: list.key },
                                                                 { title: this.state.cardName },
                                                                 { index: list.index },
                                                                 { e }
                                                             )
-                                                        }}>Save</button>
-                                                        <i onClick={this._handleClick.bind(this, -1)} className="fa fa-2x fa-times" style={{ float: "right" }}></i>                                                    </div>
-                                                </div>
-                                                <small className="text-muted">zapptax technical test</small>
+                                                        }
+                                                    }}
+                                                />
+                                                <div className="new-task-footer">
+                                                    <button type="button" className="save-button" style={{ "fontWeight": 500 }} onClick={(e) => {
+                                                        this._saveCard(
+                                                            { key: list.key },
+                                                            { title: this.state.cardName },
+                                                            { index: list.index },
+                                                            { e }
+                                                        )
+                                                    }}>Save</button>
+                                                    <i onClick={this._handleClick.bind(this, -1)} className="fa fa-2x fa-trash" style={{ float: "right", margin: "10px" }}></i>                                                    </div>
                                             </div>
-                                            :
-                                            <div className="add-task-toggle-off" onClick={this._handleClick.bind(this, index)}>
-                                                Add a task
+                                            <small className="text-muted">zapptax technical test</small>
+                                        </div>
+                                        :
+                                        <div className="add-task-toggle-off" onClick={this._handleClick.bind(this, index)}>
+                                            Add a task
                                             </div>
-                                    }
-
-                                </div>
+                                }
                             </div>
                         )
                     }

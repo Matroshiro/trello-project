@@ -38,7 +38,7 @@ body {
 
 .new-task-footer {
     display: block;
-
+    width: 100%;
 }
 
 input {
@@ -119,6 +119,7 @@ input {
     background-color: $primary_color;
     border-radius: 3px;
     padding: 10px;
+    width: 50%;
 }
 
 .add-list {
@@ -144,7 +145,7 @@ button {
 }
 
 .list-title {
-    font-size: 20px;
+    font-size: 24px;
     background-color: $primary_color;
     color: $secondary_color;
     font-weight: bold;
