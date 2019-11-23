@@ -65,6 +65,10 @@ input {
     cursor: pointer;
 }
 
+input:focus {
+    outline: none !important;
+}
+
 .my-custom-card {
     position: relative;
     display: -ms-flexbox;

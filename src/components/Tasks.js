@@ -17,6 +17,7 @@ class Tasks extends React.Component {
             listName: "",
             cardName: "",
             adding: -1,
+            editingBoard: -1,
             editingCard: -1,
             editingCardInList: -1,
             editingList: -1,
@@ -197,8 +198,8 @@ class Tasks extends React.Component {
                 adding: -1,
                 editingCard: -1,
                 editingList: -1,
-                textEdited: "",
-                listName : ""
+                textEdited : "",
+                listName : "",
             })
         }
     }
@@ -208,9 +209,12 @@ class Tasks extends React.Component {
             adding: index,
             cardName: "",
             boardName: "",
+            editingCard: -1,
             editingList: -1,
+            editingBoard: -1,
             textEdited: "",
-            listName : ""
+            listName : "",
+            boardName: ""
         });
     }
 
@@ -218,6 +222,35 @@ class Tasks extends React.Component {
         this.setState({
             currentBoard: key
         })
+    }
+
+    _handleEditBoard(index, name) {
+        console.log("board name " +  name)
+
+        this.setState({
+            editingBoard: index,
+            textEdited : name
+        });
+    }
+
+    _editBoardName(e, key) {
+        console.log("passed in editBoardName")
+        console.log("key = " + key)
+        if (this.state.textEdited === '') {
+            alert("this can not be empty")
+        } else {
+            console.log("this.state.textEdited = " + this.state.textEdited)
+            firebase
+                .database()
+                .ref('boards/' + key)
+                .set({
+                    boardName: this.state.textEdited
+                })
+            this.setState({
+                editingBoard: -1,
+                boardName: ""
+            })
+        }
     }
 
     _handleEditList(index, name) {
@@ -399,8 +432,31 @@ class Tasks extends React.Component {
                     {
                         this.state.dataBoards.map((board, index) => {
                             if (board.key == this.state.currentBoard) {
+                                console.log("editingBoard = " + this.state.editingBoard)
+                                if (this.state.editingBoard == index) {
+                                    console.log("editingBoard = " + this.state.editingBoard + " index = " + index)
+                                    return (
+                                        <div className="card-header add-board border-custom text-center board-selected-title" key={index}>
+                                        <input
+                                            className="bg-custom-secondary add-list-input "
+                                            placeholder="Add a List"
+                                            type="text"
+                                            name="textEdited"
+                                            value={this.state.textEdited}
+                                            onChange={this._handleChange}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    console.log("list.key = " + board.key)
+                                                    this._editBoardName(e, board.key)
+                                                }
+                                            }}
+                                        >
+                                        </input>
+                                    </div>
+                                    )
+                                }
                                 return (
-                                    <div className="card-header add-board border-custom text-center board-selected-title" key={index}>
+                                    <div className="card-header add-board border-custom text-center board-selected-title" key={index} onClick={this._handleEditBoard.bind(this, index, board.boardName)}>
                                         {board.boardName}
                                         <i className="fa fa-window-close" onClick={() => {
                                             this._handleDeleteBoard(board.key)
