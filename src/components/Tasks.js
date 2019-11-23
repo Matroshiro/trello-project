@@ -347,7 +347,7 @@ class Tasks extends React.Component {
                                                 >
                                                     <i onClick={() => {
                                                         this._handleDeleteCard(card.key)
-                                                    }} className="fa fa-window-close" style={{ float: "right" }}></i>
+                                                    }} className="fa fa-window-close" style={{ float: "right",  fontSize: "20px" }}></i>
                                                     {
                                                         this.state.editingCard == indexTask && this.state.editingCardInList == index ?
                                                             <textarea
@@ -370,23 +370,20 @@ class Tasks extends React.Component {
                                                             </div>
 
                                                     }
-                                                    {/*<div className="card-text"></div>*/}
-                                                    <div className="row" style={{ display: "block" }}>
+                                                    <div className="row" style={{ display: "flow-root" }}>
                                                         {
                                                             index >= 1 ? (
                                                                 <button className="bg-custom-primary" onClick={() => {
                                                                     this._handleMoveCard(card.key, index - 1)
-                                                                }}><i className="fa fa-arrow-left secondary-color"></i></button>
-                                                            ) : (<button className="" disabled>
-                                                                <i className="grey fa fa-arrow-left"></i></button>)
+                                                                }} style={{float : "left"}}><i className="fa fa-arrow-left secondary-color"></i></button>
+                                                            ) : ""
                                                         }
                                                         {
                                                             index < this.state.dataLists.length - 1 ? (
-                                                                <button className="bg-custom-primary pull-right" onClick={() => {
+                                                                <button className="bg-custom-primary" onClick={() => {
                                                                     this._handleMoveCard(card.key, index + 1)
-                                                                }}><i className="fa fa-arrow-right secondary-color"></i></button>
-                                                            ) : (<button className="pull-right" disabled>
-                                                                <i className="grey fa fa-arrow-right"></i></button>)
+                                                                }} style={{float : "right"}}><i className="fa fa-arrow-right secondary-color"></i></button>
+                                                            ) : ""
                                                         }
 
 
