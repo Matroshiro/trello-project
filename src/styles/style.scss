@@ -127,6 +127,40 @@ input {
     border-radius: 3px !important;
 }
 
+.board-title {
+    background-color: $primary_color;
+    color: $secondary_color;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.board-selected-title {
+    background-color: $secondary_color !important;
+    color: $primary_color;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.add-board {
+    background-color: $primary_color;
+    border-radius: 3px !important;
+    max-width: 200px;
+    margin-bottom: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    min-width: 200px;
+
+}
+
+.add-board-input {
+    color: $secondary_color;
+    font-size: 20px;
+    font-weight: bold;
+    min-height: 30px;
+    width: 100%;
+    text-align: center;
+}
+
 button {
     border: none;
     margin: 10px;

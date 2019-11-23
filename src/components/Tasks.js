@@ -1,7 +1,7 @@
 import React from 'react';
 import "../styles/style.scss";
 import firebase from "../firebase/index";
-import Board from "./Board";
+import List from "./List";
 import Card from "./Card";
 
 class Tasks extends React.Component {
@@ -9,8 +9,11 @@ class Tasks extends React.Component {
     constructor() {
         super()
         this.state = {
+            dataBoards: [],
+            currentBoard: "",
             dataLists: [],
             dataCards: [],
+            boardName: "",
             listName: "",
             cardName: "",
             adding: -1,
@@ -22,11 +25,43 @@ class Tasks extends React.Component {
         this._handleClick = this._handleClick.bind(this);
         this.setWrapperRef = this.setWrapperRef.bind(this);
         this._handleClickOutside = this._handleClickOutside.bind(this);
+        this._selectBoard = this._selectBoard.bind(this)
     }
 
     componentDidMount() {
-        const myList = firebase.database().ref('lists/');
         document.addEventListener('mousedown', this._handleClickOutside);
+
+        const myBoard = firebase.database().ref('boards/');
+
+        myBoard
+            .on('value', (snapshot) => {
+
+                const myBoardFromDatabase = snapshot.val()
+
+                if (myBoardFromDatabase === null) {
+                    console.log("Board in the database is null")
+                } else {
+                    const boards = Object.keys(snapshot.val()).map(key => {
+                        return {
+                            key: key,
+                            boardName: myBoardFromDatabase[key].boardName
+                        }
+                    })
+                    if (this.state.currentBoard == "") {
+                        this.setState({
+                            dataBoards: boards,
+                            currentBoard: boards[boards.length - 1].key
+                        })
+                    } else {
+                        this.setState({
+                            dataBoards: boards,
+                        })
+
+                    }
+                }
+            })
+
+        const myList = firebase.database().ref('lists/');
 
         myList
             .on('value', (snapshot) => {
@@ -39,7 +74,8 @@ class Tasks extends React.Component {
                     const lists = Object.keys(snapshot.val()).map(key => {
                         return {
                             key: key,
-                            listName: myListFromDatabase[key].listName
+                            listName: myListFromDatabase[key].listName,
+                            boardKey: myListFromDatabase[key].boardKey
                         }
                     })
                     this.setState({
@@ -85,6 +121,27 @@ class Tasks extends React.Component {
         })
     }
 
+    _saveBoard = (e) => {
+        console.log("saved board")
+        if (this.state.boardName === '') {
+            alert("this can not be empty")
+        } else {
+            const newBoardKey = firebase.database().ref('boards/').push().key;
+            firebase
+                .database()
+                .ref('boards/')
+                .update({
+                    [newBoardKey]: {
+                        boardName: this.state.boardName
+                    }
+                })
+            this.setState({
+                boardName: '',
+                currentBoard: newBoardKey
+            })
+        }
+    }
+
     _saveList = (e) => {
         console.log("saved list")
         if (this.state.listName === '') {
@@ -96,7 +153,8 @@ class Tasks extends React.Component {
                 .ref('lists/')
                 .update({
                     [newListKey]: {
-                        listName: this.state.listName
+                        listName: this.state.listName,
+                        boardKey: this.state.currentBoard
                     }
                 })
             this.setState({
@@ -146,9 +204,17 @@ class Tasks extends React.Component {
     _handleClick(index, e) {
         this.setState({
             adding: index,
+            cardName: "",
+            boardName: "",
             editingList: -1,
             textEdited: ""
         });
+    }
+
+    _selectBoard(key, e) {
+        this.setState({
+            currentBoard: key
+        })
     }
 
     _handleEditList(index) {
@@ -219,6 +285,32 @@ class Tasks extends React.Component {
         }
     }
 
+    _handleDeleteBoard = key => {
+        console.log("in handleDeleteBoard")
+        let listsNbr = 0;
+        let listInBoard = this.state.dataLists.filter(list => list.boardKey == key);
+
+        console.log(listInBoard)
+        for (let i = 0; i < listInBoard.length; i++) {
+            listsNbr++;
+        }
+        console.log("listsNbr = " + listsNbr)
+        if (listsNbr > 0) {
+            for (let i = 0; i < listInBoard.length; i++) {
+                this._handleDeleteList(listInBoard[i].key)
+            }
+        }
+
+        firebase
+            .database()
+            .ref(`boards/${key}`)
+            .remove()
+        const boardLenght = this.state.dataBoards.length
+        if (boardLenght === 1) {
+            this.setState({ dataBoards: [] })
+        }
+    }
+
     _handleDeleteList = (key) => {
 
         const { dataCards } = this.state;
@@ -282,24 +374,65 @@ class Tasks extends React.Component {
             });
     }
 
-    testFunction = (key, title) => {
-        console.log("Passed in testFunction")
-    }
-
     render() {
-        const { translateX, translateY, isDragging } = this.state;
-
+        let listInBoard = this.state.dataLists.filter(list => list.boardKey == this.state.currentBoard);
         return (
             <div>
                 <h1 className="text-center p-4 main-title">My homemade trello</h1>
+                <div className="card-deck" style={{ marginLeft: "15px" }}>
+                    {
+                        this.state.dataBoards.map((board, index) => {
+                            if (board.key == this.state.currentBoard) {
+                                return (
+                                    <div className="card-header add-board border-custom text-center board-selected-title" key={index}>
+                                        {board.boardName}
+                                        <i className="fa fa-window-close" onClick={() => {
+                                            this._handleDeleteBoard(board.key)
+                                        }} style={{ float: "right" }}></i>
+                                    </div>
+                                )
+                            } else {
+                                return (
+                                    <div className="card-header add-board border-custom text-center board-title" key={index} onClick={this._selectBoard.bind(this, board.key)}>
+                                        {board.boardName}
+                                    </div>
+                                )
+                            }
+
+                        }
+                        )}
+                    {
+                        <div className="">
+                            <div className="card-header add-board border-custom">
+                                <div className="row">
+                                    <input
+                                        className="bg-custom-primary add-board-input "
+                                        placeholder="Add a board"
+                                        type="text"
+                                        name="boardName"
+                                        value={this.state.boardName}
+                                        onChange={this._handleChange}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                this._saveBoard()
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+
                 <div ref={this.setWrapperRef} className="card-deck container-fluid row margin-left">
-                    {this.state.dataLists.map((list, index) => {
+                    {listInBoard.map((list, index) => {
 
                         const cards = this.state.dataCards
                             .filter(card => card.listKey == list.key);
                         return (
                             <div className="col-lg-2 list-content" id={list.key} key={index}>
-                                <Board id={list.key} key={index} _editTaskList={this._editTaskList} dataCards={this.state.dataCards}>
+                                <List id={list.key} key={index} _editTaskList={this._editTaskList} dataCards={this.state.dataCards}>
 
                                     {
                                         this.state.editingList == index ?
@@ -347,7 +480,7 @@ class Tasks extends React.Component {
                                                 >
                                                     <i onClick={() => {
                                                         this._handleDeleteCard(card.key)
-                                                    }} className="fa fa-window-close" style={{ float: "right",  fontSize: "20px" }}></i>
+                                                    }} className="fa fa-window-close" style={{ float: "right", fontSize: "20px" }}></i>
                                                     {
                                                         this.state.editingCard == indexTask && this.state.editingCardInList == index ?
                                                             <textarea
@@ -375,14 +508,14 @@ class Tasks extends React.Component {
                                                             index >= 1 ? (
                                                                 <button className="bg-custom-primary" onClick={() => {
                                                                     this._handleMoveCard(card.key, index - 1)
-                                                                }} style={{float : "left"}}><i className="fa fa-arrow-left secondary-color"></i></button>
+                                                                }} style={{ float: "left" }}><i className="fa fa-arrow-left secondary-color"></i></button>
                                                             ) : ""
                                                         }
                                                         {
                                                             index < this.state.dataLists.length - 1 ? (
                                                                 <button className="bg-custom-primary" onClick={() => {
                                                                     this._handleMoveCard(card.key, index + 1)
-                                                                }} style={{float : "right"}}><i className="fa fa-arrow-right secondary-color"></i></button>
+                                                                }} style={{ float: "right" }}><i className="fa fa-arrow-right secondary-color"></i></button>
                                                             ) : ""
                                                         }
 
@@ -434,35 +567,40 @@ class Tasks extends React.Component {
                                                 Add a task
                                             </div>
                                     }
-                                </Board>
+                                </List>
 
                             </div>
                         )
                     }
                     )}
-                    <div>
-                        <div className="card border-custom">
-                            <div className="card-header add-list">
-                                <div className="row">
-                                    <input
-                                        className="bg-custom-primary add-list-input "
-                                        placeholder="Add a List"
-                                        type="text"
-                                        name="listName"
-                                        value={this.state.listName}
-                                        onChange={this._handleChange}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                this._saveList()
-                                            }
-                                        }}
-                                    />
+                    {
+                        this.state.currentBoard != "" ?
+                        (<div>
+                            <div className="card border-custom" style={{marginLeft: "0"}}>
+                                <div className="card-header add-list">
+                                    <div className="row">
+                                        <input
+                                            className="bg-custom-primary add-list-input "
+                                            placeholder="Add a List"
+                                            type="text"
+                                            name="listName"
+                                            value={this.state.listName}
+                                            onChange={this._handleChange}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    this._saveList()
+                                                }
+                                            }}
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </div>) : ""
+                    }
+
 
                 </div>
+                )
             </div>);
     }
 }
