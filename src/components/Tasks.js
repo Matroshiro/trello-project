@@ -189,6 +189,7 @@ class Tasks extends React.Component {
     }
 
     _handleClickOutside(event) {
+        console.log("passed click outside")
         if (this.wrapperRef && !this.wrapperRef.contains(event.target)) {
             this.setState({
                 listName: "",
@@ -196,7 +197,8 @@ class Tasks extends React.Component {
                 adding: -1,
                 editingCard: -1,
                 editingList: -1,
-                textEdited: ""
+                textEdited: "",
+                listName : ""
             })
         }
     }
@@ -207,7 +209,8 @@ class Tasks extends React.Component {
             cardName: "",
             boardName: "",
             editingList: -1,
-            textEdited: ""
+            textEdited: "",
+            listName : ""
         });
     }
 
@@ -217,22 +220,27 @@ class Tasks extends React.Component {
         })
     }
 
-    _handleEditList(index) {
+    _handleEditList(index, name) {
+        console.log("this.state.dataLists[index].listName = " + name)
+
         this.setState({
             editingList: index,
-            textEdited: this.state.dataLists[index].listName
+            textEdited: name
         });
     }
 
-    _editListName(e, index) {
+    _editListName(e, key) {
+        console.log("key = " + key)
         if (this.state.textEdited === '') {
             alert("this can not be empty")
         } else {
+            console.log("this.state.textEdited = " + this.state.textEdited)
             firebase
                 .database()
-                .ref('lists/' + this.state.dataLists[index].key)
+                .ref('lists/' + key)
                 .set({
-                    listName: this.state.textEdited
+                    listName: this.state.textEdited,
+                    boardKey : this.state.currentBoard
                 })
             this.setState({
                 editingList: -1,
@@ -305,9 +313,16 @@ class Tasks extends React.Component {
             .database()
             .ref(`boards/${key}`)
             .remove()
+            .then(()=> {
+                if (key == this.state.currentBoard && this.state.dataBoards.length > 0) {
+                    this.setState({
+                        currentBoard: this.state.dataBoards[this.state.dataBoards.length - 1].key
+                    })
+                }
+            })
         const boardLenght = this.state.dataBoards.length
         if (boardLenght === 1) {
-            this.setState({ dataBoards: [] })
+            this.setState({ dataBoards: [], currentBoard : "" })
         }
     }
 
@@ -375,6 +390,7 @@ class Tasks extends React.Component {
     }
 
     render() {
+        console.log(this.state)
         let listInBoard = this.state.dataLists.filter(list => list.boardKey == this.state.currentBoard);
         return (
             <div>
@@ -441,10 +457,10 @@ class Tasks extends React.Component {
                                             <div className="card-title list-title text-center">
                                                 <div className="card-header add-list">
                                                     <i className="fa fa-edit" onClick={(e) => {
-                                                        this._editListName(e, index)
+                                                        this._editListName(e, list.key)
                                                     }} style={{ position: "fixed" }}></i>
                                                     <input
-                                                        className="bg-custom-primary add-list-input "
+                                                        className="bg-custom-secondary add-list-input "
                                                         placeholder="Add a List"
                                                         type="text"
                                                         name="textEdited"
@@ -452,8 +468,8 @@ class Tasks extends React.Component {
                                                         onChange={this._handleChange}
                                                         onKeyDown={(e) => {
                                                             if (e.key === 'Enter') {
-                                                                console.log("index inline = " + index)
-                                                                this._editListName(e, index)
+                                                                console.log("list.key = " + list.key)
+                                                                this._editListName(e, list.key)
                                                             }
                                                         }}
                                                     />
@@ -462,7 +478,7 @@ class Tasks extends React.Component {
 
 
                                             :
-                                            <div className="card-title list-title text-center p-3" onClick={this._handleEditList.bind(this, index)}>
+                                            <div className="card-title list-title text-center p-3" onClick={this._handleEditList.bind(this, index, list.listName)}>
                                                 {list.listName}
                                                 <i className="fa fa-window-close" onClick={() => {
                                                     this._handleDeleteList(list.key)

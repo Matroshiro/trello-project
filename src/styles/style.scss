@@ -94,6 +94,9 @@ input {
 }
 
 .add-task {
+    font-size: 20px;
+    color: #1E2748;
+    font-weight: bold;
     background: none;
     border: none;
     box-shadow: none;
@@ -123,7 +126,7 @@ input {
 }
 
 .add-list {
-    background-color: $primary_color;
+    background-color: $secondary_color;
     border-radius: 3px !important;
 }
 
@@ -180,15 +183,16 @@ button {
 
 .list-title {
     font-size: 24px;
-    background-color: $primary_color;
-    color: $secondary_color;
+    background-color: $secondary_color;
+    color: $primary_color;
     font-weight: bold;
     padding: 0;
     border-radius: 0.3rem;
 }
 
 .add-list-input {
-    color: $secondary_color;
+    color: $primary_color;
+    background-color: $secondary_color;
     font-size: 20px;
     font-weight: bold;
     min-height: 30px;
