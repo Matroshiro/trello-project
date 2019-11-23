@@ -2,26 +2,20 @@ import React from 'react';
 
 function Board (props) {
 
-    
-    let dataLists = props.dataLists
+    let dataCards = props.dataCards;
     let listId = props.id
+    let _editTaskList = props._editTaskList
 
 
     function drop(e) {
         
         e.preventDefault();
-//        e.stopPropagation();
-
         const card_id = e.dataTransfer.getData('card_id');
         const card = document.getElementById(card_id)
         card.style.display = 'block';
-        const list = document.getElementById(listId)        
-        console.log(listId)
-
-        //faire une fonction qui update la base de donnée en déplacant la card dans la liste
-
-//        console.log(card.id); id de la carte à déplacer
-        list.appendChild(card)
+        const index = dataCards.findIndex(element => element.key == card.id);
+        const name = dataCards[index].cardName;      
+        _editTaskList(card.id, name, listId, dataCards);
     }
 
     const dragOver = e => {

@@ -203,6 +203,28 @@ class Tasks extends React.Component {
         }
     }
 
+    _editTaskList(key, name, listKey, dataCards) {
+
+
+        //const {dataCards, dataLists } = this.state;
+
+        const index = dataCards.findIndex(element => element.key == key);
+        if (dataCards[index].listKey === listKey || !key || !name || !listKey || !dataCards) {
+            console.log("Missing or incorrect parameter to move the card")
+        } else {
+            firebase
+                .database()
+                .ref('cards/' + key)
+                .set({
+                    cardName: name,
+                    listKey: listKey
+                })
+//            this.setState({
+  //              textEdited: "",
+//            })
+        }
+    }
+
     _handleDeleteList = (key) => {
 
         const { dataCards } = this.state;
@@ -283,7 +305,7 @@ class Tasks extends React.Component {
                             .filter(card => card.listKey == list.key);
                         return (
                             <div className="col-lg-2 list-content" id={list.key} key={index}>
-                                <Board id={list.key} key={index} _saveList={this._saveList} dataLists={this.state.dataLists}>
+                                <Board id={list.key} key={index} _editTaskList={this._editTaskList} dataCards={this.state.dataCards}>
 
                                     {
                                         this.state.editingList == index ?
