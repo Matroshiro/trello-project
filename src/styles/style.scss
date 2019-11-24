@@ -42,6 +42,7 @@ body {
 }
 
 input {
+    outline: none !important;
     border: none;
 }
 
@@ -63,6 +64,10 @@ input {
 .add-task-toggle-off:hover {
     background-color: rgba(9,30,66,.08);
     cursor: pointer;
+}
+
+textarea:focus {
+    outline: none;
 }
 
 input:focus {
@@ -166,6 +171,7 @@ input:focus {
     min-height: 30px;
     width: 100%;
     text-align: center;
+    outline: none !important;
 }
 
 button {
@@ -202,6 +208,7 @@ button {
     min-height: 30px;
     width: 100%;
     text-align: center;
+    outline: none !important;
 }
 
 .main-title {

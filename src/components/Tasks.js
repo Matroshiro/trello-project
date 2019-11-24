@@ -21,6 +21,8 @@ class Tasks extends React.Component {
             editingCard: -1,
             editingCardInList: -1,
             editingList: -1,
+            addList: "",
+            addBoard: "", 
             textEdited: ""
         }
         this._handleClick = this._handleClick.bind(this);
@@ -116,15 +118,15 @@ class Tasks extends React.Component {
     }
 
     _handleChange = (e) => {
-        console.log("e.target.key = " + e.target.key)
+        console.log("e.target.name = " + e.target.name)
         this.setState({
             [e.target.name]: e.target.value
         })
     }
 
     _saveBoard = (e) => {
-        console.log("saved board")
-        if (this.state.boardName === '') {
+        console.log("saved board && addBoard = " + this.state.addBoard)
+        if (this.state.addBoard === '') {
             alert("this can not be empty")
         } else {
             const newBoardKey = firebase.database().ref('boards/').push().key;
@@ -133,11 +135,12 @@ class Tasks extends React.Component {
                 .ref('boards/')
                 .update({
                     [newBoardKey]: {
-                        boardName: this.state.boardName
+                        boardName: this.state.addBoard
                     }
                 })
             this.setState({
-                boardName: '',
+                addBoard: '',
+                editingBoard: -1,
                 currentBoard: newBoardKey
             })
         }
@@ -145,7 +148,7 @@ class Tasks extends React.Component {
 
     _saveList = (e) => {
         console.log("saved list")
-        if (this.state.listName === '') {
+        if (this.state.addList === '') {
             alert("this can not be empty")
         } else {
             const newListKey = firebase.database().ref('lists/').push().key;
@@ -154,12 +157,13 @@ class Tasks extends React.Component {
                 .ref('lists/')
                 .update({
                     [newListKey]: {
-                        listName: this.state.listName,
+                        listName: this.state.addList,
                         boardKey: this.state.currentBoard
                     }
                 })
             this.setState({
-                listName: ''
+                listName: '',
+                addList: ''
             })
         }
     }
@@ -190,21 +194,24 @@ class Tasks extends React.Component {
     }
 
     _handleClickOutside(event) {
-        console.log("passed click outside")
         if (this.wrapperRef && !this.wrapperRef.contains(event.target)) {
+            console.log("passed click outside")
+
             this.setState({
                 listName: "",
                 cardName: "",
                 adding: -1,
                 editingCard: -1,
                 editingList: -1,
-                textEdited : "",
-                listName : "",
+                textEdited: "",
+                listName: "",
+                boardName: ""
             })
         }
     }
 
     _handleClick(index, e) {
+        console.log("passed in _handleClick")
         this.setState({
             adding: index,
             cardName: "",
@@ -213,42 +220,43 @@ class Tasks extends React.Component {
             editingList: -1,
             editingBoard: -1,
             textEdited: "",
-            listName : "",
+            listName: "",
             boardName: ""
         });
     }
 
     _selectBoard(key, e) {
+        console.log("passed in _selectBoard")
         this.setState({
             currentBoard: key
         })
     }
 
     _handleEditBoard(index, name) {
-        console.log("board name " +  name)
-
+        console.log("board index = " + index)
+        console.log("board name = " + name)
         this.setState({
             editingBoard: index,
-            textEdited : name
+            boardName: name
         });
     }
 
     _editBoardName(e, key) {
         console.log("passed in editBoardName")
         console.log("key = " + key)
-        if (this.state.textEdited === '') {
+        if (this.state.boardName === '') {
             alert("this can not be empty")
         } else {
-            console.log("this.state.textEdited = " + this.state.textEdited)
+            console.log("this.state.textEdited = " + this.state.boardName)
             firebase
                 .database()
                 .ref('boards/' + key)
                 .set({
-                    boardName: this.state.textEdited
+                    boardName: this.state.boardName
                 })
             this.setState({
                 editingBoard: -1,
-                boardName: ""
+                boardName: "",
             })
         }
     }
@@ -258,26 +266,26 @@ class Tasks extends React.Component {
 
         this.setState({
             editingList: index,
-            textEdited: name
+            listName: name
         });
     }
 
     _editListName(e, key) {
         console.log("key = " + key)
-        if (this.state.textEdited === '') {
+        if (this.state.listName === '') {
             alert("this can not be empty")
         } else {
-            console.log("this.state.textEdited = " + this.state.textEdited)
+            console.log("this.state.textEdited = " + this.state.listName)
             firebase
                 .database()
                 .ref('lists/' + key)
                 .set({
-                    listName: this.state.textEdited,
-                    boardKey : this.state.currentBoard
+                    listName: this.state.listName,
+                    boardKey: this.state.currentBoard
                 })
             this.setState({
                 editingList: -1,
-                textEdited: ""
+                listName: ""
             })
         }
     }
@@ -286,25 +294,25 @@ class Tasks extends React.Component {
         const posTask = this.state.dataCards.findIndex(element => element.key == key);
         this.setState({
             editingCard: indexTask,
-            textEdited: this.state.dataCards[posTask].cardName,
+            cardName: this.state.dataCards[posTask].cardName,
             editingCardInList: index
         });
     }
 
     _editTaskName(e, key, listKey) {
-        if (this.state.textEdited === '') {
+        if (this.state.cardName === '') {
             alert("this can not be empty")
         } else {
             firebase
                 .database()
                 .ref('cards/' + key)
                 .set({
-                    cardName: this.state.textEdited,
+                    cardName: this.state.cardName,
                     listKey: listKey
                 })
             this.setState({
                 editingCard: -1,
-                textEdited: "",
+                cardName: "",
                 editingCardInList: -1
             })
         }
@@ -330,8 +338,6 @@ class Tasks extends React.Component {
         console.log("in handleDeleteBoard")
         let listsNbr = 0;
         let listInBoard = this.state.dataLists.filter(list => list.boardKey == key);
-
-        console.log(listInBoard)
         for (let i = 0; i < listInBoard.length; i++) {
             listsNbr++;
         }
@@ -346,7 +352,7 @@ class Tasks extends React.Component {
             .database()
             .ref(`boards/${key}`)
             .remove()
-            .then(()=> {
+            .then(() => {
                 if (key == this.state.currentBoard && this.state.dataBoards.length > 0) {
                     this.setState({
                         currentBoard: this.state.dataBoards[this.state.dataBoards.length - 1].key
@@ -355,7 +361,7 @@ class Tasks extends React.Component {
             })
         const boardLenght = this.state.dataBoards.length
         if (boardLenght === 1) {
-            this.setState({ dataBoards: [], currentBoard : "" })
+            this.setState({ dataBoards: [], currentBoard: "" })
         }
     }
 
@@ -423,254 +429,255 @@ class Tasks extends React.Component {
     }
 
     render() {
-        console.log(this.state)
         let listInBoard = this.state.dataLists.filter(list => list.boardKey == this.state.currentBoard);
         return (
             <div>
                 <h1 className="text-center p-4 main-title">My homemade trello</h1>
-                <div className="card-deck" style={{ marginLeft: "15px" }}>
-                    {
-                        this.state.dataBoards.map((board, index) => {
-                            if (board.key == this.state.currentBoard) {
-                                console.log("editingBoard = " + this.state.editingBoard)
-                                if (this.state.editingBoard == index) {
-                                    console.log("editingBoard = " + this.state.editingBoard + " index = " + index)
-                                    return (
-                                        <div className="card-header add-board border-custom text-center board-selected-title" key={index}>
-                                        <input
-                                            className="bg-custom-secondary add-list-input "
-                                            placeholder="Add a List"
-                                            type="text"
-                                            name="textEdited"
-                                            value={this.state.textEdited}
-                                            onChange={this._handleChange}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    console.log("list.key = " + board.key)
-                                                    this._editBoardName(e, board.key)
-                                                }
-                                            }}
-                                        >
-                                        </input>
-                                    </div>
-                                    )
-                                }
-                                return (
-                                    <div className="card-header add-board border-custom text-center board-selected-title" key={index} onClick={this._handleEditBoard.bind(this, index, board.boardName)}>
-                                        {board.boardName}
-                                        <i className="fa fa-window-close" onClick={() => {
-                                            this._handleDeleteBoard(board.key)
-                                        }} style={{ float: "right" }}></i>
-                                    </div>
-                                )
-                            } else {
-                                return (
-                                    <div className="card-header add-board border-custom text-center board-title" key={index} onClick={this._selectBoard.bind(this, board.key)}>
-                                        {board.boardName}
-                                    </div>
-                                )
-                            }
-
-                        }
-                        )}
-                    {
-                        <div className="">
-                            <div className="card-header add-board border-custom">
-                                <div className="row">
-                                    <input
-                                        className="bg-custom-primary add-board-input "
-                                        placeholder="Add a board"
-                                        type="text"
-                                        name="boardName"
-                                        value={this.state.boardName}
-                                        onChange={this._handleChange}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                this._saveBoard()
-                                            }
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-
-
-                <div ref={this.setWrapperRef} className="card-deck container-fluid row margin-left">
-                    {listInBoard.map((list, index) => {
-
-                        const cards = this.state.dataCards
-                            .filter(card => card.listKey == list.key);
-                        return (
-                            <div className="col-lg-2 list-content" id={list.key} key={index}>
-                                <List id={list.key} key={index} _editTaskList={this._editTaskList} dataCards={this.state.dataCards}>
-
-                                    {
-                                        this.state.editingList == index ?
-
-
-                                            <div className="card-title list-title text-center">
-                                                <div className="card-header add-list">
-                                                    <i className="fa fa-edit" onClick={(e) => {
-                                                        this._editListName(e, list.key)
-                                                    }} style={{ position: "fixed" }}></i>
-                                                    <input
-                                                        className="bg-custom-secondary add-list-input "
-                                                        placeholder="Add a List"
-                                                        type="text"
-                                                        name="textEdited"
-                                                        value={this.state.textEdited}
-                                                        onChange={this._handleChange}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === 'Enter') {
-                                                                console.log("list.key = " + list.key)
-                                                                this._editListName(e, list.key)
-                                                            }
-                                                        }}
-                                                    />
-                                                </div>
+                <div ref={this.setWrapperRef} className="container-fuid">
+                    <div ref={this.setWrapperRef} className="card-deck" style={{ marginLeft: "15px" }}>
+                        {
+                            this.state.dataBoards.map((board, index) => {
+                                if (board.key == this.state.currentBoard) {
+                                    if (this.state.editingBoard != -1 && this.state.editingBoard == index) {
+                                        return (
+                                            <div className="card-header add-board border-custom text-center board-selected-title" key={index}>
+                                                <input
+                                                    className="bg-custom-secondary add-list-input"
+                                                    placeholder="Add a Board"
+                                                    type="text"
+                                                    name="boardName"
+                                                    value={this.state.boardName}
+                                                    onChange={this._handleChange}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            console.log("list.key = " + board.key)
+                                                            this._editBoardName(e, board.key)
+                                                        }
+                                                    }}
+                                                >
+                                                </input>
                                             </div>
-
-
-                                            :
-                                            <div className="card-title list-title text-center p-3" onClick={this._handleEditList.bind(this, index, list.listName)}>
-                                                {list.listName}
+                                        )
+                                    } 
+                                    if (this.state.editingBoard == -1) {
+                                        return (
+                                            <div className="card-header add-board border-custom text-center board-selected-title" key={index} onClick={this._handleEditBoard.bind(this, index, board.boardName)}>
+                                                {board.boardName}
                                                 <i className="fa fa-window-close" onClick={() => {
-                                                    this._handleDeleteList(list.key)
+                                                    this._handleDeleteBoard(board.key)
                                                 }} style={{ float: "right" }}></i>
                                             </div>
-                                    }
-                                    {
-                                        cards.map((card, indexTask) => {
-                                            return (
-                                                <Card
-                                                    id={card.key}
-                                                    className="card-body primary-shadow card-content bg-white"
-                                                    key={indexTask}
-                                                    draggable="true"
-                                                >
-                                                    <i onClick={() => {
-                                                        this._handleDeleteCard(card.key)
-                                                    }} className="fa fa-window-close" style={{ float: "right", fontSize: "20px" }}></i>
-                                                    {
-                                                        this.state.editingCard == indexTask && this.state.editingCardInList == index ?
-                                                            <textarea
-                                                                className="add-task task-text no-shadow"
-                                                                placeholder="Add a Task"
-                                                                type="text"
-                                                                name="textEdited"
-                                                                value={this.state.textEdited}
-                                                                onChange={this._handleChange}
-                                                                onKeyDown={(e) => {
-                                                                    if (e.key === 'Enter') {
-                                                                        this._editTaskName(e, card.key, card.listKey)
-                                                                    }
-                                                                }}
-                                                            >
-                                                            </textarea>
-                                                            :
-                                                            <div className="card-title task-text" onClick={this._handleEditTask.bind(this, index, indexTask, card.key)}>
-                                                                {card.cardName}
-                                                            </div>
+                                        )
+                                    }    
+                                } else {
+                                    return (
+                                        <div className="card-header add-board border-custom text-center board-title" key={index} onClick={this._selectBoard.bind(this, board.key)}>
+                                            {board.boardName}
+                                        </div>
+                                    )
+                                }
 
-                                                    }
-                                                    <div className="row" style={{ display: "flow-root" }}>
-                                                        {
-                                                            index >= 1 ? (
-                                                                <button className="bg-custom-primary" onClick={() => {
-                                                                    this._handleMoveCard(card.key, index - 1)
-                                                                }} style={{ float: "left" }}><i className="fa fa-arrow-left secondary-color"></i></button>
-                                                            ) : ""
-                                                        }
-                                                        {
-                                                            index < this.state.dataLists.length - 1 ? (
-                                                                <button className="bg-custom-primary" onClick={() => {
-                                                                    this._handleMoveCard(card.key, index + 1)
-                                                                }} style={{ float: "right" }}><i className="fa fa-arrow-right secondary-color"></i></button>
-                                                            ) : ""
-                                                        }
-
-
-                                                    </div>
-
-                                                </Card>
-                                            )
-                                        })
-                                    }
-                                    {
-                                        this.state.adding == index ?
-                                            <div className="card-footer custom-footer">
-                                                <div className="row">
-                                                    <textarea
-                                                        className="add-task"
-                                                        key={index}
-                                                        placeholder="Add a task"
-                                                        type="text"
-                                                        name="cardName"
-                                                        value={this.state.cardName}
-                                                        onChange={this._handleChange}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === 'Enter') {
-                                                                this._saveCard(
-                                                                    { key: list.key },
-                                                                    { title: this.state.cardName },
-                                                                    { index: list.index },
-                                                                    { e }
-                                                                )
-                                                            }
-                                                        }}
-                                                    />
-                                                    <div className="new-task-footer">
-                                                        <button type="button" className="save-button" style={{ "fontWeight": 500 }} onClick={(e) => {
-                                                            this._saveCard(
-                                                                { key: list.key },
-                                                                { title: this.state.cardName },
-                                                                { index: list.index },
-                                                                { e }
-                                                            )
-                                                        }}>Save</button>
-                                                        <i onClick={this._handleClick.bind(this, -1)} className="fa fa-2x fa-trash" style={{ float: "right", margin: "10px" }}></i>                                                    </div>
-                                                </div>
-                                                <small className="text-muted">zapptax technical test</small>
-                                            </div>
-                                            :
-                                            <div className="add-task-toggle-off" onClick={this._handleClick.bind(this, index)}>
-                                                Add a task
-                                            </div>
-                                    }
-                                </List>
-
-                            </div>
-                        )
-                    }
-                    )}
-                    {
-                        this.state.currentBoard != "" ?
-                        (<div>
-                            <div className="card border-custom" style={{marginLeft: "0"}}>
-                                <div className="card-header add-list">
+                            }
+                            )}
+                        {
+                            <div className="">
+                                <div className="card-header add-board border-custom">
                                     <div className="row">
                                         <input
-                                            className="bg-custom-primary add-list-input "
-                                            placeholder="Add a List"
+                                            className="bg-custom-primary add-board-input "
+                                            placeholder="Add a board"
                                             type="text"
-                                            name="listName"
-                                            value={this.state.listName}
+                                            name="addBoard"
+                                            value={this.state.addBoard}
                                             onChange={this._handleChange}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') {
-                                                    this._saveList()
+                                                    this._saveBoard()
                                                 }
                                             }}
                                         />
                                     </div>
                                 </div>
                             </div>
-                        </div>) : ""
-                    }
+                        }
+                    </div>
 
 
+                    <div className="card-deck container-fluid row margin-left">
+                        {listInBoard.map((list, index) => {
+
+                            const cards = this.state.dataCards
+                                .filter(card => card.listKey == list.key);
+                            return (
+                                <div className="col-lg-2 list-content" id={list.key} key={index}>
+                                    <List id={list.key} key={index} _editTaskList={this._editTaskList} dataCards={this.state.dataCards}>
+
+                                        {
+                                            this.state.editingList == index ?
+
+
+                                                <div className="card-title list-title text-center">
+                                                    <div className="card-header add-list">
+                                                        <i className="fa fa-edit" onClick={(e) => {
+                                                            this._editListName(e, list.key)
+                                                        }} style={{ position: "fixed" }}></i>
+                                                        <input
+                                                            className="bg-custom-secondary add-list-input "
+                                                            placeholder="Add a List"
+                                                            type="text"
+                                                            name="listName"
+                                                            value={this.state.listName}
+                                                            onChange={this._handleChange}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') {
+                                                                    console.log("list.key = " + list.key)
+                                                                    this._editListName(e, list.key)
+                                                                }
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+
+
+                                                :
+                                                <div className="card-title list-title text-center p-3" onClick={this._handleEditList.bind(this, index, list.listName)}>
+                                                    {list.listName}
+                                                    <i className="fa fa-window-close" onClick={() => {
+                                                        this._handleDeleteList(list.key)
+                                                    }} style={{ float: "right" }}></i>
+                                                </div>
+                                        }
+                                        {
+                                            cards.map((card, indexTask) => {
+                                                return (
+                                                    <Card
+                                                        id={card.key}
+                                                        className="card-body primary-shadow card-content bg-white"
+                                                        key={indexTask}
+                                                        draggable="true"
+                                                    >
+                                                        <i onClick={() => {
+                                                            this._handleDeleteCard(card.key)
+                                                        }} className="fa fa-window-close" style={{ float: "right", fontSize: "20px" }}></i>
+                                                        {
+                                                            this.state.editingCard == indexTask && this.state.editingCardInList == index ?
+                                                                <textarea
+                                                                    className="add-task task-text no-shadow"
+                                                                    placeholder="Add a Task"
+                                                                    type="text"
+                                                                    name="cardName"
+                                                                    value={this.state.cardName}
+                                                                    onChange={this._handleChange}
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === 'Enter') {
+                                                                            this._editTaskName(e, card.key, card.listKey)
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                </textarea>
+                                                                :
+                                                                <div className="card-title task-text" onClick={this._handleEditTask.bind(this, index, indexTask, card.key)}>
+                                                                    {card.cardName}
+                                                                </div>
+
+                                                        }
+                                                        <div className="row" style={{ display: "flow-root" }}>
+                                                            {
+                                                                index >= 1 ? (
+                                                                    <button className="bg-custom-primary" onClick={() => {
+                                                                        this._handleMoveCard(card.key, index - 1)
+                                                                    }} style={{ float: "left" }}><i className="fa fa-arrow-left secondary-color"></i></button>
+                                                                ) : ""
+                                                            }
+                                                            {
+                                                                index < this.state.dataLists.length - 1 ? (
+                                                                    <button className="bg-custom-primary" onClick={() => {
+                                                                        this._handleMoveCard(card.key, index + 1)
+                                                                    }} style={{ float: "right" }}><i className="fa fa-arrow-right secondary-color"></i></button>
+                                                                ) : ""
+                                                            }
+
+
+                                                        </div>
+
+                                                    </Card>
+                                                )
+                                            })
+                                        }
+                                        {
+                                            this.state.adding == index ?
+                                                <div className="card-footer custom-footer">
+                                                    <div className="row">
+                                                        <textarea
+                                                            className="add-task"
+                                                            key={index}
+                                                            placeholder="Add a task"
+                                                            type="text"
+                                                            name="cardName"
+                                                            value={this.state.cardName}
+                                                            onChange={this._handleChange}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') {
+                                                                    this._saveCard(
+                                                                        { key: list.key },
+                                                                        { title: this.state.cardName },
+                                                                        { index: list.index },
+                                                                        { e }
+                                                                    )
+                                                                }
+                                                            }}
+                                                        />
+                                                        <div className="new-task-footer">
+                                                            <button type="button" className="save-button" style={{ "fontWeight": 500 }} onClick={(e) => {
+                                                                this._saveCard(
+                                                                    { key: list.key },
+                                                                    { title: this.state.cardName },
+                                                                    { index: list.index },
+                                                                    { e }
+                                                                )
+                                                            }}>Save</button>
+                                                            <i onClick={this._handleClick.bind(this, -1)} className="fa fa-2x fa-trash" style={{ float: "right", margin: "10px" }}></i>                                                    </div>
+                                                    </div>
+                                                    <small className="text-muted">zapptax technical test</small>
+                                                </div>
+                                                :
+                                                <div className="add-task-toggle-off" onClick={this._handleClick.bind(this, index)}>
+                                                    Add a task
+                                            </div>
+                                        }
+                                    </List>
+
+                                </div>
+                            )
+                        }
+                        )}
+                        {
+                            this.state.currentBoard != "" ?
+                                (<div>
+                                    <div className="card border-custom" style={{ marginLeft: "0" }}>
+                                        <div className="card-header add-list">
+                                            <div className="row">
+                                                <input
+                                                    className="bg-custom-primary add-list-input "
+                                                    placeholder="Add a List"
+                                                    type="text"
+                                                    name="addList"
+                                                    value={this.state.addList}
+                                                    onChange={this._handleChange}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            this._saveList()
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>) : ""
+                        }
+
+
+                    </div>
                 </div>
                 )
             </div>);
