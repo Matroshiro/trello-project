@@ -22,7 +22,7 @@ class Tasks extends React.Component {
             editingCardInList: -1,
             editingList: -1,
             addList: "",
-            addBoard: "", 
+            addBoard: "",
             textEdited: ""
         }
         this._handleClick = this._handleClick.bind(this);
@@ -114,7 +114,6 @@ class Tasks extends React.Component {
     }
 
     componentDidUpdate() {
-
     }
 
     _handleChange = (e) => {
@@ -159,7 +158,6 @@ class Tasks extends React.Component {
                     }
                 })
             this.setState({
-                listName: '',
                 addList: ''
             })
         }
@@ -282,7 +280,8 @@ class Tasks extends React.Component {
         this.setState({
             editingCard: indexTask,
             cardName: this.state.dataCards[posTask].cardName,
-            editingCardInList: index
+            editingCardInList: index,
+            adding : -1
         });
     }
 
@@ -445,6 +444,7 @@ class Tasks extends React.Component {
                                                             this._editBoardName(e, board.key)
                                                         }
                                                     }}
+                                                    autoFocus={true}
                                                 >
                                                 </input>
                                             </div>
@@ -484,6 +484,7 @@ class Tasks extends React.Component {
                                                     this._saveBoard()
                                                 }
                                             }}
+                                            autoFocus={true}
                                         />
                                     </div>
                                 </div>
@@ -512,7 +513,7 @@ class Tasks extends React.Component {
                                                         }} style={{ position: "fixed" }}></i>
                                                         <input
                                                             className="bg-custom-secondary add-list-input "
-                                                            placeholder="Add a List"
+                                                            placeholder="Name the list"
                                                             type="text"
                                                             name="listName"
                                                             value={this.state.listName}
@@ -522,6 +523,7 @@ class Tasks extends React.Component {
                                                                     this._editListName(e, list.key)
                                                                 }
                                                             }}
+                                                            autoFocus={true}
                                                         />
                                                     </div>
                                                 </div>
@@ -562,6 +564,7 @@ class Tasks extends React.Component {
                                                                             this._editTaskName(e, card.key, card.listKey)
                                                                         }
                                                                     }}
+                                                                    autoFocus={ true }
                                                                 >
                                                                 </textarea>
                                                                 :
@@ -615,6 +618,7 @@ class Tasks extends React.Component {
                                                                     )
                                                                 }
                                                             }}
+                                                            autoFocus={ true }
                                                         />
                                                         <div className="new-task-footer">
                                                             <button type="button" className="save-button" style={{ "fontWeight": 500 }} onClick={(e) => {
@@ -658,6 +662,7 @@ class Tasks extends React.Component {
                                                             this._saveList()
                                                         }
                                                     }}
+                                                    autoFocus={true}
                                                 />
                                             </div>
                                         </div>
