@@ -361,7 +361,7 @@ class Tasks extends React.Component {
             })
         const boardLenght = this.state.dataBoards.length
         if (boardLenght === 1) {
-            this.setState({ dataBoards: [], currentBoard: "" })
+            this.setState({ dataBoards: [], currentBoard: "", editingBoard: -1 })
         }
     }
 
@@ -437,7 +437,13 @@ class Tasks extends React.Component {
                     <div ref={this.setWrapperRef} className="card-deck" style={{ marginLeft: "15px" }}>
                         {
                             this.state.dataBoards.map((board, index) => {
+                                console.log("dataBoardsmap board name = " + board.boardName)
+
+
+
                                 if (board.key == this.state.currentBoard) {
+                                    console.log("this.state.currentBoard =  " + this.state.currentBoard + " && Board.key = " + board.key)
+
                                     if (this.state.editingBoard != -1 && this.state.editingBoard == index) {
                                         return (
                                             <div className="card-header add-board border-custom text-center board-selected-title" key={index}>
@@ -459,7 +465,6 @@ class Tasks extends React.Component {
                                             </div>
                                         )
                                     } 
-                                    if (this.state.editingBoard == -1) {
                                         return (
                                             <div className="card-header add-board border-custom text-center board-selected-title" key={index} onClick={this._handleEditBoard.bind(this, index, board.boardName)}>
                                                 {board.boardName}
@@ -467,9 +472,9 @@ class Tasks extends React.Component {
                                                     this._handleDeleteBoard(board.key)
                                                 }} style={{ float: "right" }}></i>
                                             </div>
-                                        )
-                                    }    
+                                        )   
                                 } else {
+                                    console.log("board.boardName in else =  " + board.boardName)
                                     return (
                                         <div className="card-header add-board border-custom text-center board-title" key={index} onClick={this._selectBoard.bind(this, board.key)}>
                                             {board.boardName}
